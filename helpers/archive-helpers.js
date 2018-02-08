@@ -60,7 +60,7 @@ exports.isUrlArchived = function(url, callback) {
 exports.downloadUrls = function(urls) {
   for (var i = 0; i < urls.length; i++) {
     //request('https://google.com', (err, res, body) => console.log(err ? err : 'download'))
-    request('http://' + urls[i]).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + urls[i]));
+    request('https://' + urls[i]).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + urls[i]));
   }
   
   // http.get(-----, function() {

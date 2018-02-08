@@ -26,18 +26,30 @@ exports.serveAssets = function(res, asset, callback) {
       }
     });
   } else {
-    fs.readFile(archive.paths.archivedSites + asset, 'utf8', function(error, data) {
+    fs.readFile(archive.paths.archivedSites + '/' + asset, 'utf8', function(error, data) {
       console.log(archive.paths.archivedSites + asset);
       if (error) {
-        console.log('ERROR!');
+        exports.headers['Content-Type'] = 'text/html';
+        res.writeHead(404, exports.headers);
+        res.end();
       } else {
-        exports.headers['Content-Type'] = 'text/plain';
+        exports.headers['Content-Type'] = 'text/html';
         res.writeHead(200, exports.headers);
         res.end(data);
         return res;
       }
     });
   }
+};
+
+exports.getData = function(req, cb) {
+  var data = '';
+  req.on('data', function(chunk) {
+    data += chunk;
+  });
+  req.on('end', function() {
+    cb(data);
+  });
 };
 
 

@@ -35,20 +35,30 @@ exports.handleRequest = function (req, res) {
 
 
   } else if (req.method === 'POST') {
-    var body = '';
-
-    req.on('data', function(data) {
-      body += data;
-    });
-
-    req.on('end', function() {
-      var url = body.slice(4) + '\n';
-      fs.appendFile(archive.paths.list, url, function(err) {
-        if (err) {
-          console.log('error adding item to list');
+    helpers.getData(req, function (data) {
+      data = data.slice(4);
+      archive.isUrlInList(data, function(isInList) {
+        if (!isInList) {
+          archive.addUrlToList(data);
+          fs.readFile(__dirname + '/public/loading.html', function(error, data) {
+            res.writeHead(302, helpers.headers);
+            res.end(data);
+            
+          });
+          
         } else {
-          console.log('saved to list');
-        }
+          archive.isUrlArchived(data, function(isArchived) {
+            if (!isArchived) {
+              fs.readFile(__dirname + '/public/loading.html', function(error, data) {
+                console.log(__dirname);
+                res.writeHead(302, helpers.headers);
+                res.end(data);
+              });
+            } else {
+              helpers.serveAssets(res, data);
+            }
+          });
+        } 
       });
     });
   }
